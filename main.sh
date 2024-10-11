@@ -6,6 +6,9 @@ cd "$project_path" || exit 1
 # Fetch the latest updates from the remote repository
 git fetch origin
 
+# Fetch all branches and tags from the remote repository
+git fetch --all
+
 # List all branches and echo them for debugging purposes
 echo "Available branches:"
 git branch -a
