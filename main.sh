@@ -31,13 +31,13 @@ else
     exit 1
 fi
 
-# Checkout the specific branch or commit (assuming 'target_commit' contains the branch or commit hash)
+# Checkout the specific branch or commit (assuming 'TARGET_COMMIT' contains the branch or commit hash)
 git checkout "$TARGET_COMMIT" || {
     echo "Error: Could not checkout commit/branch '$TARGET_COMMIT'. Exiting."
     exit 1
 }
 
-# Pull the latest changes from the branch (if target_commit is a branch name)
+# Pull the latest changes from the branch (if TARGET_COMMIT is a branch name)
 git pull origin "$TARGET_COMMIT" || {
     echo "Error: Could not pull latest changes from '$TARGET_COMMIT'. Exiting."
     exit 1
@@ -55,24 +55,24 @@ rsync -av \
     --exclude='.*' \
     --include='.gitignore' \
     --include='.gitkeep' \
-    --exclude={$manual_exclusions} \
-    . "$CI_PROJECT_DIR/code_zips/$full_code_dir_name"
+    --exclude={$MANUAL_EXCLUSIONS} \
+    . "$CI_PROJECT_DIR/code_zips/$FULL_CODE_DIR_NAME"
 
 # Verify that excluded items were not copied and remove them if found
-for excluded_item in $manual_exclusions; do
-    find "$CI_PROJECT_DIR/code_zips/$full_code_dir_name" -name "$excluded_item" -exec rm -rf {} \;
+for excluded_item in $MANUAL_EXCLUSIONS; do
+    find "$CI_PROJECT_DIR/code_zips/$FULL_CODE_DIR_NAME" -name "$excluded_item" -exec rm -rf {} \;
 done
 
 # Modify the configs.dart file
-config_path_of_full_code_dir="$CI_PROJECT_DIR/code_zips/$full_code_dir_name/lib/configs.dart"
+config_path_of_full_code_dir="$CI_PROJECT_DIR/code_zips/$FULL_CODE_DIR_NAME/lib/configs.dart"
 sed -i -e '/\/\/.*const.*DOMAIN_URL.*=/d' -e '/Development Url/d' "$config_path_of_full_code_dir"
 sed -i 's/^const.*DOMAIN_URL.*=.*https:\/\/.*/const DOMAIN_URL = "";/' "$config_path_of_full_code_dir"
 
-echo "Copy of the latest code created from commit/branch '$target_commit' and changes made to configs.dart."
+echo "Copy of the latest code created from commit/branch '$TARGET_COMMIT' and changes made to configs.dart."
 
 # Step 4: Create updated code directory
-mkdir -p "$updated_files_path"
-updated_files=$(git diff --name-only "$source_commit" "$target_commit")
+mkdir -p "$UPDATED_CODE_ZIP_NAME"
+updated_files=$(git diff --name-only "$SOURCE_COMMIT" "$TARGET_COMMIT")
 
 # Use rsync to copy only the updated files while excluding all hidden files/folders except .gitignore and .gitkeep, and applying the manual exclusions
 for file in $updated_files; do
@@ -80,17 +80,17 @@ for file in $updated_files; do
         --exclude='.*' \
         --include='.gitignore' \
         --include='.gitkeep' \
-        --exclude={$manual_exclusions} \
-        "$file" "$updated_files_path/$(dirname "$file")"
+        --exclude={$MANUAL_EXCLUSIONS} \
+        "$file" "$UPDATED_CODE_ZIP_NAME/$(dirname "$file")"
 done
 
 # Verify that excluded items were not copied in updated files and remove them if found
-for excluded_item in $manual_exclusions; do
-    find "$updated_files_path" -name "$excluded_item" -exec rm -rf {} \;
+for excluded_item in $MANUAL_EXCLUSIONS; do
+    find "$UPDATED_CODE_ZIP_NAME" -name "$excluded_item" -exec rm -rf {} \;
 done
 
 # Modify the configs.dart file for the updated code
-config_path_of_updated_code="$updated_files_path/lib/configs.dart"
+config_path_of_updated_code="$UPDATED_CODE_ZIP_NAME/lib/configs.dart"
 sed -i -e '/\/\/.*const.*DOMAIN_URL.*=/d' -e '/Development Url/d' "$config_path_of_updated_code"
 sed -i 's/^const.*DOMAIN_URL.*=.*https:\/\/.*/const DOMAIN_URL = "";/' "$config_path_of_updated_code"
 
