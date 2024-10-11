@@ -72,7 +72,7 @@ echo "Available remote branches with their SHA:"
 git for-each-ref --format='%(refname:short) %(objectname:short)' refs/remotes/
 echo "==================Available branches=========END=============="
 echo "-------------------"
-git --help
+pwd
 echo "-------------------"
 git diff --name-only "$SOURCE_COMMIT" "$TARGET_COMMIT"
 echo "-------------------"
