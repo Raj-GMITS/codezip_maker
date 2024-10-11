@@ -9,10 +9,6 @@ git fetch origin
 # Fetch all branches and tags from the remote repository
 git fetch --all
 
-# List all remote branches with their corresponding SHA
-echo "Available remote branches with their SHA:"
-git for-each-ref --format='%(refname:short) %(objectname:short)' refs/remotes/
-
 # Step 1: Print available branches
 echo "Available branches:"
 git branch -a  # Show all branches
@@ -68,6 +64,13 @@ sed -i -e '/\/\/.*const.*DOMAIN_URL.*=/d' -e '/Development Url/d' "$config_path_
 sed -i 's/^const.*DOMAIN_URL.*=.*https:\/\/.*/const DOMAIN_URL = "";/' "$config_path_of_full_code_dir"
 
 echo "Copy of the latest code created from commit/branch '$TARGET_COMMIT' and changes made to configs.dart."
+echo "==================Available branches=========START=============="
+# Fetch all branches and tags from the remote repository
+git fetch --all
+git branch -a  # Show all branches
+echo "Available remote branches with their SHA:"
+git for-each-ref --format='%(refname:short) %(objectname:short)' refs/remotes/
+echo "==================Available branches=========END=============="
 echo "-------------------"
 pwd
 echo "-------------------"
