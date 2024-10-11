@@ -9,9 +9,9 @@ git fetch origin
 # Fetch all branches and tags from the remote repository
 git fetch --all
 
-# List all branches and echo them for debugging purposes
-echo "Available branches:"
-git branch -a
+# List all remote branches with their corresponding SHA
+echo "Available remote branches with their SHA:"
+git for-each-ref --format='%(refname:short) %(objectname:short)' refs/remotes/
 
 # Checkout the specific branch or commit (assuming 'target_commit' contains the branch or commit hash)
 git checkout "$TARGET_COMMIT" || {
