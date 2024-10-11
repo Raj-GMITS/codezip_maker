@@ -72,7 +72,9 @@ echo "Available remote branches with their SHA:"
 git for-each-ref --format='%(refname:short) %(objectname:short)' refs/remotes/
 echo "==================Available branches=========END=============="
 echo "-------------------"
-pwd
+# Ensure all branches are fetched
+git fetch origin --unshallow  # Fetch full history if a shallow clone was used
+git fetch origin "$SOURCE_COMMIT" "$TARGET_COMMIT"  # Ensure both 'main' and 'dev' are fetched
 echo "-------------------"
 git diff --name-only "$SOURCE_COMMIT" "$TARGET_COMMIT"
 echo "-------------------"
