@@ -6,6 +6,10 @@ cd "$project_path" || exit 1
 # Fetch the latest updates from the remote repository
 git fetch origin
 
+# List all branches and echo them for debugging purposes
+echo "Available branches:"
+git branch -a
+
 # Checkout the specific branch or commit (assuming 'target_commit' contains the branch or commit hash)
 git checkout "$TARGET_COMMIT" || {
     echo "Error: Could not checkout commit/branch '$TARGET_COMMIT'. Exiting."
