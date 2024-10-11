@@ -73,8 +73,14 @@ git for-each-ref --format='%(refname:short) %(objectname:short)' refs/remotes/
 echo "==================Available branches=========END=============="
 echo "-------------------"
 # Ensure all branches are fetched
-git fetch origin --unshallow  # Fetch full history if a shallow clone was used
-git fetch origin "$SOURCE_COMMIT" "$TARGET_COMMIT"  # Ensure both 'main' and 'dev' are fetched
+# Ensure the main branch is fetched and exists locally
+if ! git show-ref --verify --quiet refs/remotes/origin/$SOURCE_COMMIT; then
+    echo "Fetching missing source branch '$SOURCE_COMMIT'..."
+    git fetch origin $SOURCE_COMMIT || {
+        echo "Error: Could not fetch branch '$SOURCE_COMMIT'. Exiting."
+        exit 1
+    }
+fi
 echo "-------------------"
 git diff --name-only "$SOURCE_COMMIT" "$TARGET_COMMIT"
 echo "-------------------"
