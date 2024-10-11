@@ -20,14 +20,14 @@ echo "Available remote branches with their SHA:"
 git for-each-ref --format='%(refname:short) %(objectname:short)' refs/remotes/
 
 # Check out the target branch
-if git show-ref --verify --quiet refs/remotes/origin/$target_branch; then
+if git show-ref --verify --quiet refs/remotes/origin/$TARGET_COMMIT; then
     # Check out the specific branch or commit (assuming 'target_branch' is set)
-    git checkout "$target_branch" || {
-        echo "Error: Could not checkout branch '$target_branch'. Exiting."
+    git checkout "$TARGET_COMMIT" || {
+        echo "Error: Could not checkout branch '$TARGET_COMMIT'. Exiting."
         exit 1
     }
 else
-    echo "Branch '$target_branch' does not exist."
+    echo "Branch '$TARGET_COMMIT' does not exist."
     exit 1
 fi
 
