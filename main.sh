@@ -68,7 +68,11 @@ sed -i -e '/\/\/.*const.*DOMAIN_URL.*=/d' -e '/Development Url/d' "$config_path_
 sed -i 's/^const.*DOMAIN_URL.*=.*https:\/\/.*/const DOMAIN_URL = "";/' "$config_path_of_full_code_dir"
 
 echo "Copy of the latest code created from commit/branch '$TARGET_COMMIT' and changes made to configs.dart."
-
+echo "-------------------"
+pwd
+echo "-------------------"
+git diff --name-only "$SOURCE_COMMIT" "$TARGET_COMMIT"
+echo "-------------------"
 # Step 4: Create updated code directory only if there are changes
 updated_files=$(git diff --name-only "$SOURCE_COMMIT" "$TARGET_COMMIT")
 
