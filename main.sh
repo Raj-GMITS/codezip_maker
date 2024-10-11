@@ -72,15 +72,7 @@ echo "Available remote branches with their SHA:"
 git for-each-ref --format='%(refname:short) %(objectname:short)' refs/remotes/
 echo "==================Available branches=========END=============="
 echo "-------------------"
-# Ensure all branches are fetched
-# Ensure the main branch is fetched and exists locally
-if ! git show-ref --verify --quiet refs/remotes/origin/$SOURCE_COMMIT; then
-    echo "Fetching missing source branch '$SOURCE_COMMIT'..."
-    git fetch origin $SOURCE_COMMIT || {
-        echo "Error: Could not fetch branch '$SOURCE_COMMIT'. Exiting."
-        exit 1
-    }
-fi
+git --help
 echo "-------------------"
 git diff --name-only "$SOURCE_COMMIT" "$TARGET_COMMIT"
 echo "-------------------"
