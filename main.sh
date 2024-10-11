@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Step 3: Checkout and create a copy of the latest code from the specified target commit
-cd "$project_path" || exit 1
+# Fetch and check out the correct branch from the CI project repo
+cd "$CI_PROJECT_DIR" || exit 1
 
 # Fetch the latest updates from the remote repository
 git fetch origin
