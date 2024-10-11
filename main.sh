@@ -49,7 +49,6 @@ mkdir -p "$CI_PROJECT_DIR/code_zips/$FULL_CODE_DIR_NAME"
 # Define additional items to exclude
 MANUAL_EXCLUSIONS="android/local.properties android/app/release android/app/build pubspec.lock *.lock *.rest *.iml ios/Pods ios/Podfile.lock"
 
-
 # Use rsync to copy the full code while excluding all hidden files/folders except .gitignore and .gitkeep, and applying the manual exclusions
 rsync -av \
     --exclude='.*' \
@@ -70,28 +69,36 @@ sed -i 's/^const.*DOMAIN_URL.*=.*https:\/\/.*/const DOMAIN_URL = "";/' "$config_
 
 echo "Copy of the latest code created from commit/branch '$TARGET_COMMIT' and changes made to configs.dart."
 
-# Step 4: Create updated code directory
-mkdir -p "$UPDATED_CODE_ZIP_NAME"
+# Step 4: Create updated code directory only if there are changes
 updated_files=$(git diff --name-only "$SOURCE_COMMIT" "$TARGET_COMMIT")
 
-# Use rsync to copy only the updated files while excluding all hidden files/folders except .gitignore and .gitkeep, and applying the manual exclusions
-for file in $updated_files; do
-    rsync -av \
-        --exclude='.*' \
-        --include='.gitignore' \
-        --include='.gitkeep' \
-        --exclude={$MANUAL_EXCLUSIONS} \
-        "$file" "$UPDATED_CODE_ZIP_NAME/$(dirname "$file")"
-done
+if [ -n "$updated_files" ]; then
+    echo "Updated files found. Proceeding to copy them."
 
-# Verify that excluded items were not copied in updated files and remove them if found
-for excluded_item in $MANUAL_EXCLUSIONS; do
-    find "$UPDATED_CODE_ZIP_NAME" -name "$excluded_item" -exec rm -rf {} \;
-done
+    mkdir -p "$UPDATED_CODE_ZIP_NAME"
 
-# Modify the configs.dart file for the updated code
-config_path_of_updated_code="$UPDATED_CODE_ZIP_NAME/lib/configs.dart"
-sed -i -e '/\/\/.*const.*DOMAIN_URL.*=/d' -e '/Development Url/d' "$config_path_of_updated_code"
-sed -i 's/^const.*DOMAIN_URL.*=.*https:\/\/.*/const DOMAIN_URL = "";/' "$config_path_of_updated_code"
+    # Use rsync to copy only the updated files while excluding all hidden files/folders except .gitignore and .gitkeep, and applying the manual exclusions
+    for file in $updated_files; do
+        rsync -av \
+            --exclude='.*' \
+            --include='.gitignore' \
+            --include='.gitkeep' \
+            --exclude={$MANUAL_EXCLUSIONS} \
+            "$file" "$UPDATED_CODE_ZIP_NAME/$(dirname "$file")"
+    done
 
-echo "Changes made to configs.dart in the updated code."
+    # Verify that excluded items were not copied in updated files and remove them if found
+    for excluded_item in $MANUAL_EXCLUSIONS; do
+        find "$UPDATED_CODE_ZIP_NAME" -name "$excluded_item" -exec rm -rf {} \;
+    done
+
+    # Modify the configs.dart file for the updated code
+    config_path_of_updated_code="$UPDATED_CODE_ZIP_NAME/lib/configs.dart"
+    sed -i -e '/\/\/.*const.*DOMAIN_URL.*=/d' -e '/Development Url/d' "$config_path_of_updated_code"
+    sed -i 's/^const.*DOMAIN_URL.*=.*https:\/\/.*/const DOMAIN_URL = "";/' "$config_path_of_updated_code"
+
+    echo "Changes made to configs.dart in the updated code."
+
+else
+    echo "No updated files found between '$SOURCE_COMMIT' and '$TARGET_COMMIT'. Skipping updated code directory creation."
+fi
