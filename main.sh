@@ -4,10 +4,8 @@
 cd "$CI_PROJECT_DIR" || exit 1
 
 # Fetch the latest updates from the remote repository
-git fetch origin
-
-# Fetch all branches and tags from the remote repository
-git fetch --all
+git fetch origin --unshallow
+git fetch --all --tags
 
 # Step 1: Print available branches
 echo "Available branches:"
@@ -15,29 +13,33 @@ git branch -a  # Show all branches
 echo "Available remote branches with their SHA:"
 git for-each-ref --format='%(refname:short) %(objectname:short)' refs/remotes/
 
-# Check out the target branch
-if git show-ref --verify --quiet refs/remotes/origin/$TARGET_COMMIT; then
-    # Check out the specific branch or commit (assuming 'target_branch' is set)
-    git checkout "$TARGET_COMMIT" || {
-        echo "Error: Could not checkout branch '$TARGET_COMMIT'. Exiting."
-        exit 1
-    }
+# Function to check if input is a branch name or commit SHA
+is_branch_name() {
+    git show-ref --verify --quiet "refs/heads/$1"
+}
+
+# Function to check if input is a commit SHA
+is_commit_sha() {
+    git cat-file -e "$1^{commit}" 2>/dev/null
+}
+
+# Determine if SOURCE_COMMIT and TARGET_COMMIT are branches or SHA
+if is_branch_name "$TARGET_COMMIT"; then
+    echo "$TARGET_COMMIT is a branch"
+    git checkout "$TARGET_COMMIT"
+    git pull origin "$TARGET_COMMIT"
+elif is_commit_sha "$TARGET_COMMIT"; then
+    echo "$TARGET_COMMIT is a commit SHA"
+    git checkout "$TARGET_COMMIT"
 else
-    echo "Branch '$TARGET_COMMIT' does not exist."
+    echo "Error: $TARGET_COMMIT is neither a valid branch nor a commit SHA."
     exit 1
 fi
 
-# Checkout the specific branch or commit (assuming 'TARGET_COMMIT' contains the branch or commit hash)
-git checkout "$TARGET_COMMIT" || {
-    echo "Error: Could not checkout commit/branch '$TARGET_COMMIT'. Exiting."
-    exit 1
-}
-
-# Pull the latest changes from the branch (if TARGET_COMMIT is a branch name)
-git pull origin "$TARGET_COMMIT" || {
-    echo "Error: Could not pull latest changes from '$TARGET_COMMIT'. Exiting."
-    exit 1
-}
+# Pull the latest changes from the branch if it's a branch name
+if is_branch_name "$TARGET_COMMIT"; then
+    git pull origin "$TARGET_COMMIT"
+fi
 
 # Create directory for the full code
 mkdir -p "$CI_PROJECT_DIR/code_zips/$FULL_CODE_DIR_NAME"
@@ -64,18 +66,14 @@ sed -i -e '/\/\/.*const.*DOMAIN_URL.*=/d' -e '/Development Url/d' "$config_path_
 sed -i 's/^const.*DOMAIN_URL.*=.*https:\/\/.*/const DOMAIN_URL = "";/' "$config_path_of_full_code_dir"
 
 echo "Copy of the latest code created from commit/branch '$TARGET_COMMIT' and changes made to configs.dart."
+
 echo "==================Available branches=========START=============="
-# Fetch all branches and tags from the remote repository
-git fetch --all
-git branch -a  # Show all branches
+git fetch --all --tags
+git branch -a
 echo "Available remote branches with their SHA:"
 git for-each-ref --format='%(refname:short) %(objectname:short)' refs/remotes/
 echo "==================Available branches=========END=============="
-echo "-------------------"
-pwd
-echo "-------------------"
-git diff --name-only "$SOURCE_COMMIT" "$TARGET_COMMIT"
-echo "-------------------"
+
 # Step 4: Create updated code directory only if there are changes
 updated_files=$(git diff --name-only "$SOURCE_COMMIT" "$TARGET_COMMIT")
 
