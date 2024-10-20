@@ -48,6 +48,7 @@ echo "keyPassword=" >> "$key_properties"
 echo "keyAlias=" >> "$key_properties"
 echo "storeFile=" >> "$key_properties"
 
+zip -r "$full_code_dir_name.zip" "$full_code_files_path"
 
 # # Open the modified configs.dart file with gedit
 # gedit "$config_path_of_full_code_dir" &
@@ -97,6 +98,7 @@ for file in $updated_files; do
 done
 
 rm -r "$updated_files_path/.vscode"
+zip -r "$updated_code_zip_name.zip" "$updated_files_path"
 echo "Updated files have been copied to: $updated_files_path"
 
 # Modify the configs.dart file for the updated code
@@ -129,16 +131,16 @@ echo "🤖 : The configs.dart file in the updated code has been modified."
 echo ""
 
 # Step 9: Make zips of full code and updated code separately
-cd $CI_PROJECT_DIR
-mkdir -p "$final_code_zip_name"
-cd "$full_code_files_path"
-zip -r "$full_code_dir_name.zip" .
-mv "$full_code_dir_name.zip" "$CI_PROJECT_DIR/$final_code_zip_name"
-cd "$updated_files_path"
-zip -r "$updated_code_zip_name.zip" .
-mv "$updated_code_zip_name.zip" "$CI_PROJECT_DIR/$final_code_zip_name"
-cd "$CI_PROJECT_DIR/$final_code_zip_name"
-zip -r "$final_code_zip_name.zip" .
-mv "$final_code_zip_name.zip" "$CI_PROJECT_DIR"
-cd $CI_PROJECT_DIR
-echo "🤖 : Sir, I have created Final Zip $final_code_zip_name.zip at $CI_PROJECT_DIR"
+# cd $CI_PROJECT_DIR
+# mkdir -p "$final_code_zip_name"
+# cd "$full_code_files_path"
+# zip -r "$full_code_dir_name.zip" .
+# mv "$full_code_dir_name.zip" "$CI_PROJECT_DIR/$final_code_zip_name"
+# cd "$updated_files_path"
+# zip -r "$updated_code_zip_name.zip" .
+# mv "$updated_code_zip_name.zip" "$CI_PROJECT_DIR/$final_code_zip_name"
+# cd "$CI_PROJECT_DIR/$final_code_zip_name"
+# zip -r "$final_code_zip_name.zip" .
+# mv "$final_code_zip_name.zip" "$CI_PROJECT_DIR"
+# cd $CI_PROJECT_DIR
+# echo "🤖 : Sir, I have created Final Zip $final_code_zip_name.zip at $CI_PROJECT_DIR"
