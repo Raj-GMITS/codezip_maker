@@ -111,8 +111,8 @@ echo "Changes made to configs.dart in the updated code."
 
 
 # Step 5: Open updated files directory in the terminal and execute 'tree'
-echo "Opening terminal with updated files directory..."
-gnome-terminal -- bash -c "cd '$updated_files_path' && tree; exec bash"
+# echo "Opening terminal with updated files directory..."
+# gnome-terminal -- bash -c "cd '$updated_files_path' && tree; exec bash"
 
 # # Open the modified configs.dart file with gedit
 # gedit "$config_path_of_updated_code" &
