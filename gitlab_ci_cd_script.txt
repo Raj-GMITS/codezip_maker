@@ -1,0 +1,65 @@
+image: ubuntu:22.04  # Use Ubuntu 22.04, which aligns with 22.04.4 LTS (codename jammy)
+
+stages:
+  - create_zip
+
+variables:
+  REPO_URL_WITH_GL_TOKEN: https://<PAT_NAME>:<PAT>@gitlab.com/example-app.git
+  SOURCE_COMMIT: "main"
+  TARGET_COMMIT: "development"
+  FULL_CODE_DIR_NAME: "example-app-v1.3.1"
+  UPDATED_CODE_ZIP_NAME: "example-updated-files-v1.3.1"
+  FINAL_CODE_ZIP_NAME: "example-code-zip-v1.3.1"
+
+
+create_code_zip:
+  stage: create_zip
+  script:
+    - echo "Running on Ubuntu 22.04.4 LTS (Jammy Jellyfish)"
+    - uname -a
+    - cat /etc/os-release  # To Confirm the Ubuntu version is 22.04.4 LTS
+    - apt-get update
+    - apt-get install -y jq zip git rsync # Install packages
+    - mkdir -p $HOME/Desktop $HOME/Project $HOME/Downloads  # Creating custom directories
+    - ls $HOME
+    - cd $HOME/Project
+    - echo "Cloning the repository..."
+    - git clone "$REPO_URL_WITH_GL_TOKEN"
+    - NAVIGATE_TO_PATH=$(ls -d */ | head -n 1)  # Get the first directory name (if only one directory exists)
+    - echo "NAVIGATE_TO_PATH-> $NAVIGATE_TO_PATH"
+    - cd "$HOME/Project/$NAVIGATE_TO_PATH"  # Navigate to the directory
+    - pwd  # Verify the directory
+    - ls  # Verify contents of the directory
+    - git fetch --all
+    - echo "Available local branches:"
+    - git branch -a  # Lists all local branches
+    - git checkout "$TARGET_COMMIT"
+    - cd $HOME/Desktop
+    - echo "Cloning the codezip_maker repository..."
+    - git clone https://github.com/Raj-GMITS/codezip_maker.git
+    - cp "codezip_maker/main.sh" "$HOME/Desktop"
+    - cp "codezip_maker/params.json" "$HOME/Desktop"
+    - ls
+    # Write the parameters to params.json
+    - |
+      cat > "$HOME/Desktop/params.json" <<EOF
+      {
+        "project_path": "$HOME/Project/$NAVIGATE_TO_PATH",
+        "source_commit": "$SOURCE_COMMIT",
+        "target_commit": "$TARGET_COMMIT",
+        "full_code_dir_name": "$FULL_CODE_DIR_NAME",
+        "updated_code_zip_name": "$UPDATED_CODE_ZIP_NAME",
+        "final_code_zip_name": "$FINAL_CODE_ZIP_NAME"
+      }
+      EOF
+    - cat params.json
+    - chmod +x main.sh  # Make sure your script is executable
+    - echo "Running the CI zip maker script..."
+    - ./main.sh
+    - mv "$HOME/Desktop/$FINAL_CODE_ZIP_NAME.zip" "$CI_PROJECT_DIR"
+
+  artifacts:
+    paths:
+      - $CI_PROJECT_DIR/$FINAL_CODE_ZIP_NAME.zip
+
+  # when: manual  # This makes the job manual; a button will appear in the UI to trigger it      
