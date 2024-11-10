@@ -1,19 +1,13 @@
 {
-    "project_path":"/home/raj/Documents/Flutter GM/pawlly",
+    "project_path":"$HOME/Projects/example-app",
 
-    "live_domain_url":"https://apps.iqonic.design/pawlly",
+    "source_commit":"main",
+
+    "target_commit":"development",
     
-    "source_commit":"f60953d2fb3f21e7684e5d57c5a507d1356cf89f",
+    "full_code_dir_name":"example-app-v1.3.1",
 
-    "target_commit":"26a941cf7a794b5afc09f5b8bdf4501345fddef7",
-
-    "full_code_files_path":"/home/raj/Desktop/code_zips/pawlly_flutter_app",
-
-    "full_code_dir_name":"pawlly_flutter_app",
-
-    "updated_files_path":"/home/raj/Desktop/code_zips/pawlly_flutter_app_updated_files_v1.0.3",
-
-    "updated_code_zip_name":"pawlly_flutter_app_updated_files_v1.0.3",
+    "updated_code_zip_name":"example-app-updated-files-v1.3.1",
     
-    "final_code_zip_name": "pawlly_app_code_zip_v1.0.3"
+    "final_code_zip_name": "example-app-code-zip-v1.3.1"
 }
