@@ -18,13 +18,30 @@ done
 
 # Function to check and install necessary tools
 check_and_install_tools() {
-    tools=("jq" "zip" "git" "rsync" "tree")
+    # Start with the common tools
+    tools=("jq" "zip" "git" "rsync")
+
+    # Add 'tree' if detailed tree view is enabled
+    [ "$disply_detailed_tree_view" = true ] && tools+=("tree")
+    
+    # Check if script is running as root
+    is_root=false
+    if [[ $(id -u) -eq 0 ]]; then
+        is_root=true
+    fi
+
     for tool in "${tools[@]}"; do
         if ! command -v "$tool" &> /dev/null; then
             echo "Tool '$tool' is not installed. Attempting to install..."
+            
             if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-                sudo apt update
-                sudo apt install -y "$tool"
+                if $is_root; then
+                    apt update
+                    apt install -y "$tool"
+                else
+                    sudo apt update
+                    sudo apt install -y "$tool"
+                fi
             elif [[ "$OSTYPE" == "darwin"* ]]; then
                 # Check for Homebrew and install if necessary
                 if ! command -v brew &> /dev/null; then
@@ -41,7 +58,7 @@ check_and_install_tools() {
     done
 }
 
-# Run the tool check and installation function
+# Run the function to check and install tools
 check_and_install_tools
 
 # Function to read parameters from params.json
